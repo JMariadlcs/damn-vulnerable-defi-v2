@@ -42,7 +42,7 @@ contract PuppetV2Pool {
      */
     function borrow(uint256 borrowAmount) external {
         // Calculate how much WETH the user must deposit
-        uint256 amount = calculateDepositOfWETHRequired(borrowAmount);
+        uint256 amount = calculateDepositOfWETHRequired(borrowAmount); // should return 0
 
         // Take the WETH
         _weth.transferFrom(msg.sender, address(this), amount);
@@ -57,13 +57,15 @@ contract PuppetV2Pool {
 
     function calculateDepositOfWETHRequired(uint256 tokenAmount) public view returns (uint256) {
         uint256 depositFactor = 3;
-        return _getOracleQuote(tokenAmount).mul(depositFactor) / (1 ether);
+        return _getOracleQuote(tokenAmount).mul(depositFactor) / (1 ether); // should return 0
     }
 
     // Fetch the price from Uniswap v2 using the official libraries
     function _getOracleQuote(uint256 amount) private view returns (uint256) {
         (uint256 reservesWETH, uint256 reservesToken) =
             UniswapV2Library.getReserves(_uniswapFactory, address(_weth), address(_token));
-        return UniswapV2Library.quote(amount.mul(10 ** 18), reservesToken, reservesWETH);
+        return UniswapV2Library.quote(amount.mul(10 ** 18), reservesToken, reservesWETH); // should return 0. 1st param: amountToken, 2nd: reserveToken, 3rd: reserveEth
+                                                                                            // quote formula: amountB = amountA.mul(reserveB) / reserveA;
+                                                                                            // we need to increase reserveA to amountB be 0 -> send token to increase reserveA
     }
 }
