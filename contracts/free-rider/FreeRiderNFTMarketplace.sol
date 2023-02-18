@@ -90,7 +90,7 @@ contract FreeRiderNFTMarketplace is ReentrancyGuard {
         if (priceToPay == 0)
             revert TokenNotOffered(tokenId);
 
-        if (msg.value < priceToPay)
+        if (msg.value < priceToPay) // vuln: only checks if can pays the higher price not the sum of all them
             revert InsufficientPayment();
 
         --offersCount;
@@ -100,7 +100,7 @@ contract FreeRiderNFTMarketplace is ReentrancyGuard {
         _token.safeTransferFrom(_token.ownerOf(tokenId), msg.sender, tokenId);
 
         // pay seller using cached token
-        payable(_token.ownerOf(tokenId)).sendValue(priceToPay);
+        payable(_token.ownerOf(tokenId)).sendValue(priceToPay); // vuln: pays the buyer not the seller because the token has been already transfered
 
         emit NFTBought(msg.sender, tokenId, priceToPay);
     }
